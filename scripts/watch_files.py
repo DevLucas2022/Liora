@@ -3,6 +3,11 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import time
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 BASE_DIR = Path().resolve()
 
@@ -10,7 +15,7 @@ BASE_DIR = Path().resolve()
 # load_script = BASE_DIR / "etl" / "load" / "vendas_load" / "load_vendas.py"
 
 RAW_FODLER = Path(f"{BASE_DIR}/data/raw")
-HASH_TRACKER = Path(f"{BASE_DIR}config/hash_tracker.json")
+HASH_TRACKER = Path(f"{BASE_DIR}/config/hash_tracker.json")
 
 def calcular_hash_md5(caminho_arquivo):
     with open(caminho_arquivo, "rb") as f:
@@ -61,8 +66,12 @@ def main():
                 transform_script = BASE_DIR / f"etl/transform/{empresa}_transform/tratar_{empresa}.py"
                 load_script = BASE_DIR / f"etl/load/{empresa}_load/load_{empresa}.py"
                 print(f"\n🚀 Rodando pipeline para: {empresa}")
-                subprocess.run(["python", str(transform_script)], check=True)
-                subprocess.run(["python", str(load_script)], check=True)
+                
+                python_venv = BASE_DIR / "venv" / "bin" / "python"
+                env = os.environ.copy()
+
+                subprocess.run([str(python_venv), str(transform_script)], check=True, env = env)
+                subprocess.run([str(python_venv), str(load_script)], check=True, env = env)
             else:
                 print(f"⚠️ Empresa não identificada para: {arquivo}")
     else:
@@ -74,7 +83,6 @@ def main():
             print(f" - {arquivo}")
 
     salvar_hashes_atuais(novos_hashes)
-        
+    
 if __name__ == "__main__":
     main()
-   

@@ -22,6 +22,9 @@
 from supabase import create_client, Client
 import pandas as pd
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Conexão com Supabase
 url = os.getenv("SUPABASE_URL")
